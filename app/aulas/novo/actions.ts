@@ -63,7 +63,14 @@ export async function cadastrarAula(formData: FormData) {
       );
 
       imagem = blob.url;
-    } catch {
+    } catch (erro) {
+      console.error("Erro ao enviar imagem para o Blob:", erro);
+
+      const mensagem =
+        erro instanceof Error ? erro.message : String(erro);
+
+      console.error("Detalhes do upload:", mensagem);
+
       redirect("/aulas/novo?erro=imagem_upload");
     }
   }
