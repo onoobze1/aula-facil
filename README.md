@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AulaFácil
 
-## Getting Started
+**Nicho:** Aulas particulares (música, idiomas, reforço) · **Grupo:** 19
 
-First, run the development server:
+**Aluno:** Anthony Tavares Nascimento ([@onoobze1](https://github.com/onoobze1))
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Sistema no ar:** https://aula-facil.vercel.app
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**GitHub:** https://github.com/onoobze1/aula-facil
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## O que o sistema faz
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O AulaFácil é um site que desenvolvi para divulgar aulas particulares de idiomas, música e reforço escolar.
 
-## Learn More
+Nele, é possível ver as aulas disponíveis, consultar seus detalhes e, depois de fazer login, cadastrar e editar as próprias aulas. O sistema também possui validação dos dados e permite enviar imagens para as aulas.
 
-To learn more about Next.js, take a look at the following resources:
+## Páginas para testar
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Página pública:** https://aula-facil.vercel.app/
+- **Login:** https://aula-facil.vercel.app/login
+- **Cadastro de aulas:** https://aula-facil.vercel.app/aulas/novo
+- **Versão da aplicação:** https://aula-facil.vercel.app/api/versao
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+As páginas que precisam de login devem impedir o acesso de quem não está autenticado.
 
-## Deploy on Vercel
+## Banco de dados
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Utilizei PostgreSQL, hospedado no Neon, e Prisma ORM para acessar e organizar os dados.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Entidades e relacionamentos
+
+- **User:** armazena os dados dos usuários.
+- **Aula:** armazena o título, a descrição, a categoria, o preço, a imagem e o professor responsável.
+- **Relacionamento:** cada aula pertence a um professor, e um professor pode cadastrar várias aulas.
+
+As alterações na estrutura do banco ficam registradas na pasta `prisma/migrations`.
+
+## Como rodar no computador
+
+### Requisitos
+
+- Node.js compatível com o projeto.
+- npm.
+- Variáveis de ambiente configuradas para acessar o banco de dados e os serviços utilizados.
+
+### Instalação
+
+1. Clonar o repositório:
+
+   ```bash
+   git clone https://github.com/onoobze1/aula-facil.git
+   cd aula-facil
+   ```
+
+2. Instalar as dependências:
+
+   ```bash
+   npm install
+   ```
+
+3. Criar o arquivo `.env` com as variáveis necessárias, seguindo o modelo `.env.example`.
+
+4. Configurar o banco de dados e gerar o cliente do Prisma conforme as instruções do projeto.
+
+5. Iniciar o servidor:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Acessar http://localhost:3000.
+
+O arquivo `.env` contém informações privadas e não deve ser enviado ao GitHub. O repositório deve conter apenas o `.env.example`, sem senhas ou tokens reais.
+
+## Como usei a IA
+
+- **IA usada:** ChatGPT.
+
+### Os 3 pedidos que mais me ajudaram
+
+1. Ajudar a criar o cadastro de aulas utilizando Next.js, Prisma e validação dos dados.
+2. Ajudar a corrigir os problemas que apareceram durante a configuração do upload de imagens com Vercel Blob.
+3. Ajudar a implementar a edição de aulas, verificando se o usuário está logado e se é o responsável pela aula.
+
+### Um erro da IA e como corrigi
+
+Durante a configuração do upload de imagens, ocorreu um erro porque o código tentava utilizar acesso público em um armazenamento privado do Vercel Blob.
+
+Para corrigir, configurei um armazenamento público e ajustei o código e as variáveis de ambiente para utilizar esse armazenamento. Depois, testei novamente o envio das imagens.
+
+### O que aprendi
+
+Aprendi a criar e publicar um site utilizando Next.js, a conectar o sistema a um banco de dados, a implementar login, a validar formulários e a enviar imagens para a nuvem.
+
+Também aprendi que a IA pode cometer erros e que é importante testar o código, entender as mensagens de erro e conferir se as soluções realmente funcionam.
