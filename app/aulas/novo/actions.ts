@@ -27,7 +27,9 @@ export async function cadastrarAula(formData: FormData) {
     headers: await headers(),
   });
 
-  if (!session) redirect("/login");
+  if (!session) {
+    redirect("/login");
+  }
 
   const resultado = aulaSchema.safeParse({
     titulo: formData.get("titulo"),
@@ -64,18 +66,23 @@ export async function cadastrarAula(formData: FormData) {
 
       imagem = blob.url;
     } catch (erro) {
-      console.error("ERRO AO ENVIAR IMAGEM PARA O BLOB:", erro);
+      console.error("ERRO BLOB:", erro);
       throw erro;
     }
   }
 
-  await prisma.aula.create({
-    data: {
-      ...resultado.data,
-      imagem,
-      professorId: session.user.id,
-    },
-  });
+  try {
+    await prisma.aula.create({
+      data: {
+        ...resultado.data,
+        imagem,
+        professorId: session.user.id,
+      },
+    });
+  } catch (erro) {
+    console.error("ERRO AO SALVAR A AULA:", erro);
+    throw erro;
+  }
 
   redirect("/aulas");
 }
