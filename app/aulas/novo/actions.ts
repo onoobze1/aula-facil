@@ -3,6 +3,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { put } from "@vercel/blob";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -14,14 +15,19 @@ const aulaSchema = z.object({
   preco: z.coerce.number().positive("O preço deve ser maior que zero."),
 });
 
+const tiposPermitidos = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+];
+
 export async function cadastrarAula(formData: FormData) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session) {
-    redirect("/login");
-  }
+  if (!session) redirect("/login");
 
   const resultado = aulaSchema.safeParse({
     titulo: formData.get("titulo"),
@@ -34,9 +40,38 @@ export async function cadastrarAula(formData: FormData) {
     redirect("/aulas/novo?erro=dados");
   }
 
+  const arquivo = formData.get("imagem");
+  let imagem: string | null = null;
+
+  if (arquivo instanceof File && arquivo.size > 0) {
+    if (!tiposPermitidos.includes(arquivo.type)) {
+      redirect("/aulas/novo?erro=imagem_tipo");
+    }
+
+    if (arquivo.size > 2 * 1024 * 1024) {
+      redirect("/aulas/novo?erro=imagem_tamanho");
+    }
+
+    try {
+      const blob = await put(
+        `aulas/${crypto.randomUUID()}-${arquivo.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`,
+        arquivo,
+        {
+          access: "public",
+          addRandomSuffix: true,
+        }
+      );
+
+      imagem = blob.url;
+    } catch {
+      redirect("/aulas/novo?erro=imagem_upload");
+    }
+  }
+
   await prisma.aula.create({
     data: {
       ...resultado.data,
+      imagem,
       professorId: session.user.id,
     },
   });
