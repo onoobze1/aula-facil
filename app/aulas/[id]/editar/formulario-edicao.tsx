@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState } from "react";
@@ -13,6 +14,7 @@ type Props = {
     descricao: string;
     categoria: string;
     preco: string;
+    imagem: string | null;
   };
 };
 
@@ -25,7 +27,11 @@ export default function FormularioEdicao({ aula }: Props) {
   );
 
   return (
-    <form action={formAction} className="mt-8 space-y-5">
+    <form
+      action={formAction}
+      encType="multipart/form-data"
+      className="mt-8 space-y-5"
+    >
       <input type="hidden" name="id" value={aula.id} />
 
       <div>
@@ -88,6 +94,33 @@ export default function FormularioEdicao({ aula }: Props) {
           required
           defaultValue={aula.preco}
           className="w-full rounded-lg border px-3 py-2"
+        />
+      </div>
+
+      {aula.imagem && (
+        <div>
+          <p className="mb-2 font-medium">Imagem atual</p>
+          <img
+            src={aula.imagem}
+            alt={`Imagem atual de ${aula.titulo}`}
+            className="max-h-56 rounded-lg border object-contain"
+          />
+          <p className="mt-1 text-sm text-gray-500">
+            Se não escolher outra imagem, a atual será mantida.
+          </p>
+        </div>
+      )}
+
+      <div>
+        <label htmlFor="imagem" className="mb-1 block font-medium">
+          Nova imagem (opcional, até 2 MB)
+        </label>
+        <input
+          id="imagem"
+          name="imagem"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="w-full min-w-0 rounded-lg border px-3 py-2"
         />
       </div>
 

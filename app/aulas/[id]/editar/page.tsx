@@ -1,7 +1,10 @@
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import FormularioEdicao from "./formulario-edicao";
 
 export const dynamic = "force-dynamic";
 
@@ -9,17 +12,21 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export default async function DetalhesAulaPage({ params }: Props) {
+export default async function EditarAulaPage({ params }: Props) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const { id } = await params;
 
-  const aula = await prisma.aula.findUnique({
-    where: { id },
-    include: {
-      professor: {
-        select: {
-          name: true,
-        },
-      },
+  const aula = await prisma.aula.findFirst({
+    where: {
+      id,
+      professorId: session.user.id,
     },
   });
 
@@ -28,33 +35,32 @@ export default async function DetalhesAulaPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-12 text-gray-900">
-      <div className="mx-auto max-w-3xl rounded-xl border bg-white p-8 shadow-sm">
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10 text-gray-900">
+      <section className="w-full max-w-2xl rounded-xl border bg-white p-5 shadow-sm sm:p-8">
         <Link
-          href="/aulas"
-          className="text-sm font-semibold text-blue-700 hover:underline"
+          href={`/aulas/${aula.id}`}
+          className="text-sm text-blue-700 hover:underline"
         >
-          ← Voltar ao catálogo
+          ← Voltar à aula
         </Link>
 
-        <p className="mt-8 text-sm font-semibold text-blue-700">
-          {aula.categoria}
+        <h1 className="mt-5 text-3xl font-bold">Editar aula</h1>
+
+        <p className="mt-2 text-gray-600">
+          Altere os dados abaixo e salve suas modificações.
         </p>
 
-        <h1 className="mt-2 text-3xl font-bold">{aula.titulo}</h1>
-
-        <p className="mt-6 whitespace-pre-wrap leading-relaxed text-gray-700">
-          {aula.descricao}
-        </p>
-
-        <p className="mt-6 text-gray-600">
-          Professor: {aula.professor.name}
-        </p>
-
-        <p className="mt-3 text-2xl font-bold">
-          R$ {Number(aula.preco).toFixed(2).replace(".", ",")}
-        </p>
-      </div>
+        <FormularioEdicao
+          aula={{
+            id: aula.id,
+            titulo: aula.titulo,
+            descricao: aula.descricao,
+            categoria: aula.categoria,
+            preco: String(aula.preco),
+            imagem: aula.imagem,
+          }}
+        />
+      </section>
     </main>
   );
 }
